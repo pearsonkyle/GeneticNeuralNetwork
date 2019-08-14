@@ -20,11 +20,21 @@ Call the function like such: `create_data( np.cos, 10000)`
 If you want to use a custom function, feel free but remember to change the range in which the function is evaluated. For the example above the data is evalulated between 0 and 2 pi, with 10000 random points inbetween. 
 
 ## Neural Network Architecture
-TensorFlow is used to create a deep neural network that is eventually trained to compute a trig function. The class `individual` has properties that pertain to building a parameterized machine learning model, creating a random architecture and breeding/swapping traits between models for the genetic algorithm optimization
+TensorFlow is used to create a deep neural network that is eventually trained to compute a trig function. The class `individual` has properties that pertain to building a parameterized machine learning model, creating a random architecture and breeding/swapping traits between models for the genetic algorithm optimization. The neural network architecture is parameterized using a cos function: 
+```python
+layer_func = lambda x, A,w: (A*np.cos(w*np.linspace(0,np.pi/2,x))).astype(int)
+```
+where *x* corresponds to the number of layers, *A* is the amplitude of the first layer with all subsequent layers being smaller than that and *w* changes the rate of neural degradation. 50 random samples of the function will looks like this:
 
-The parameterization of our neural network architecture is like such: 
-![]()
+![](NN_parameterization.png)
 
+Each network has an input size of 1 corresponding to an angle and an output size of 1 corresponding to the respective tangent function evaluation for that angle. 
+
+## Examples
+
+```
+python genetic_network --train 
+```
 
 ## Future Applications
 While this program was made as a joke, the optimization using a genetic algorithm is something that can be used in modern day research particularly if you can train a neural network in a reasonable amount of time. Then you can leverage this ensamble sampling technique to find the best architecture. 

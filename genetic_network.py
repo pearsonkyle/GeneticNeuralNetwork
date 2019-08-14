@@ -59,6 +59,7 @@ class individual():
         traits2 = {}
         for k in traits:
             if k in swap_traits:
+                print('swap')
                 traits1[k] = getattr( parent2, k)
                 traits2[k] = getattr( parent1, k)
             else:
@@ -73,9 +74,7 @@ class individual():
 def create_data(func, NUM=10000):
     X = np.random.choice( np.linspace(0,2*np.pi, NUM+1000), NUM, replace=False)
     y = func(X)
-    X = X.reshape(-1,1)
-    y = y.reshape(-1,1)
-    return X,y
+    return X.reshape(-1,1), y.reshape(-1,1)
 
 if __name__ == "__main__":
 
@@ -88,6 +87,7 @@ if __name__ == "__main__":
     X_train, y_train = create_data( np.cos, 10000)
     X_test, y_test = create_data( np.cos, 10000)
     
+    '''
     # create lots of neural networks
     population = []
     print("Generating initial population")
@@ -97,4 +97,25 @@ if __name__ == "__main__":
     for j in range(5): # generation 
 
         for i in range(len(population)):
-            population[i].train
+            population[i].fit(X_train, y_train)
+    '''
+    
+    cm = plt.cm.get_cmap('jet')
+    f,ax = plt.subplots(1)
+    for i in range(50):
+        sizes = layer_func(
+            np.random.randint(1,10),
+            np.random.randint(1,100),
+            np.random.random()*2 + 0.1,
+        )
+        for j in range(len(sizes)):
+            if sizes[j] <= 0:
+                break
+        ax.plot(1+np.arange(len(sizes[:j])), sizes[:j], color =cm(i/50))
+
+    ax.set_ylabel('Number of Neurons')
+    ax.set_xlabel('Layer Number')
+    ax.set_title('Random Samples of Parameterized Architecture')
+    ax.grid(True,ls='--')
+    plt.tight_layout()
+    plt.savefig('NN_parameterization.png')
