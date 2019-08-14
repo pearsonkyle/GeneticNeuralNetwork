@@ -22,10 +22,11 @@ Call the function like such: `create_data( np.cos, 10000)`
 If you want to use a custom function, feel free but remember to change the range in which the function is evaluated. For the example above the data is evalulated between 0 and 2 pi, with 10000 random points inbetween. 
 
 ## Neural Network Architecture
-TensorFlow is used to create a deep neural network that is eventually trained to compute a trig function. The class `individual` stores a definition for the 
+TensorFlow is used to create a deep neural network that is eventually trained to compute a trig function. The class `individual` has properties that pertain to building a parameterized machine learning model, creating a random architecture and breeding/swapping traits between models for the genetic algorithm optimization
 
-![]()
 The parameterization of our neural network architecture is like such: 
+![]()
+
 
 ## Future Applications
 While this program was made as a joke, the optimization using a genetic algorithm is something that can be used in modern day research particularly if you can train a neural network in a reasonable amount of time. Then you can leverage this ensamble sampling technique to find the best architecture. 
