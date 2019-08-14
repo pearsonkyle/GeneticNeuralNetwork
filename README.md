@@ -13,9 +13,7 @@ Simulated data is used to train the neural network and custom data can be create
 def create_data(func, NUM=10000):
     X = np.random.choice( np.linspace(0,2*np.pi, NUM+1000), NUM, replace=False)
     y = func(X)
-    X = X.reshape(-1,1)
-    y = y.reshape(-1,1)
-    return X,y
+    return X.reshape(-1,1), y.reshape(-1,1)
 ```
 Call the function like such: `create_data( np.cos, 10000)`
 
