@@ -100,22 +100,4 @@ if __name__ == "__main__":
             population[i].fit(X_train, y_train)
     '''
     
-    cm = plt.cm.get_cmap('jet')
-    f,ax = plt.subplots(1)
-    for i in range(50):
-        sizes = layer_func(
-            np.random.randint(1,10),
-            np.random.randint(1,100),
-            np.random.random()*2 + 0.1,
-        )
-        for j in range(len(sizes)):
-            if sizes[j] <= 0:
-                break
-        ax.plot(1+np.arange(len(sizes[:j])), sizes[:j], color =cm(i/50))
 
-    ax.set_ylabel('Number of Neurons')
-    ax.set_xlabel('Layer Number')
-    ax.set_title('Random Samples of Parameterized Architecture')
-    ax.grid(True,ls='--')
-    plt.tight_layout()
-    plt.savefig('NN_parameterization.png')

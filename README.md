@@ -28,7 +28,7 @@ where *x* corresponds to the number of layers, *A* is the amplitude of the first
 
 ![](NN_parameterization.png)
 
-Each network has an input size of 1 corresponding to an angle and an output size of 1 corresponding to the respective tangent function evaluation for that angle. 
+Each network has an input size of 1 corresponding to an angle and an output size of 1 corresponding to the respective trig function evaluation for that angle. 
 
 ## Examples
 
