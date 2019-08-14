@@ -27,9 +27,9 @@ class individual():
                 layer = layers.Dense(self.layer_sizes[i], activation= 'relu')(layer)
             else:
                 break
-            if i == 1:
-                layer = layers.Dropout(self.dropout)(layer)
-        output = layers.Dense(1, activation= 'relu')(layer)
+            #if i == 1:
+                #layer = layers.Dropout(self.dropout)(layer)
+        output = layers.Dense(1, activation= 'linear')(layer)
         self.model = tf.keras.Model(inputs=inputlayer, outputs=output)
         SGDsolver = tf.keras.optimizers.SGD(
             learning_rate=self.learning_rate, 
@@ -37,10 +37,10 @@ class individual():
             decay=self.decay, 
             nesterov=True
         )
-        self.model.compile(loss='mse', optimizer=SGDsolver)
+        self.model.compile(loss='mean_squared_error', optimizer='Adam')
 
-    def fit(self,X,y,epochs=10):
-        self.model.fit(X,y, batch_size=self.batch_size, epochs=epochs, validation_split=0.1)
+    def fit(self,X,y,epochs=100):
+        self.model.fit(X,y, batch_size=self.batch_size, epochs=epochs)#, validation_split=0.1)
     
     @property
     def traits(self):
@@ -53,15 +53,15 @@ class individual():
     def random_traits():
         traits = {
             'layer_sizes':layer_func(
-                np.random.randint(1,10),
-                np.random.randint(2,100),
+                np.random.randint(3,10),
+                np.random.randint(10,200),
                 np.random.random()*2 + 0.1,
             ),
             'learning_rate': np.round( np.random.random()*0.5+0.01, 4),
             'momentum': np.round(np.random.random()*0.5+0.01, 4),
             'dropout': np.round(np.random.random()*0.5, 4),
-            'decay': np.round(np.random.random()*0.01,4),
-            'batch_size': np.random.randint(1,64),
+            'decay': np.round(np.random.random()*0.0001,4),
+            'batch_size': np.random.randint(1,32),
         }
         return traits
 
@@ -116,8 +116,8 @@ if __name__ == "__main__":
         # num generations
     
     # create some data 
-    X_train, y_train = create_data( np.cos, 10000)
-    X_test, y_test = create_data( np.cos, 10000)
+    X_train, y_train = create_data( np.cos, 1000)
+    X_test, y_test = create_data( np.cos, 1000)
     
     parent1 = individual.randomize()
     parent2 = individual.randomize()
@@ -127,10 +127,25 @@ if __name__ == "__main__":
     print(baby1.traits)
     print(baby2.traits)
     
+    parent1.fit( X_train, y_train )
 
-    '''
+    f,ax = plt.subplots(2)
+    y_pred = parent1.model.predict( X_train ) 
+    mse = np.sum( (y_pred - y_train)**2) 
+    print(mse)
+    plt.plot(X_train,y_pred,'k.'); plt.plot(X_train,y_train,'g.'); plt.show() 
+
+    y_pred = parent1.model.predict( X_test ) 
+    mse = np.sum( (y_pred - y_test)**2) 
+    print(mse)
+    plt.plot(X_test,y_pred,'r.'); plt.plot(X_test,y_test,'g.'); plt.show() 
+
+
+
+    dude()
     # create lots of neural networks
     population = []
+    mse = []
     print("Generating initial population")
     for i in range(100):
         population.append( individual.randomize() )
@@ -139,6 +154,6 @@ if __name__ == "__main__":
 
         for i in range(len(population)):
             population[i].fit(X_train, y_train)
-    '''
+
     
 

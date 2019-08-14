@@ -49,7 +49,7 @@ A genetic algorithm is used to explore the parameter space from which the neural
 - `decay` - time inverse decay of learning rate
 - `dropout` - rate of dropout after first layer
 
-An example of generating two random models and then breeding them to produce offspring:
+An example generating two random models and then breeding them to produce offspring:
 ```python
 from genetic_network import individual
 parent1 = individual.randomize()
