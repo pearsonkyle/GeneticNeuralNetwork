@@ -10,11 +10,23 @@ A submission for the very first [/r/ProgrammerHumor hackathon, Over Engineered](
 ## Running an Example
 
 1. open ipython
-2. run genetic_network.py --func cos
+2. `run genetic_network.py`
+```
+usage: genetic_network.py [-h] [-e EPOCHS] [-p POPULATION] [-g GENERATIONS]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -e EPOCHS, --epochs EPOCHS
+                        Number of training epochs
+  -p POPULATION, --population POPULATION
+                        Initial population size
+  -g GENERATIONS, --generations GENERATIONS
+                        Number of generations
+```
 
 ... let it train and breed, the best network will be saved to an h5py file
 
-3. run evaluate.py --angle 40
+3. `run evaluate.py --angle 40`
 
 
 ## Training Data

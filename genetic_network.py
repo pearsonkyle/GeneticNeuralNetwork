@@ -27,8 +27,8 @@ class individual():
                 layer = layers.Dense(self.layer_sizes[i], activation= 'relu')(layer)
             else:
                 break
-            #if i == 1:
-                #layer = layers.Dropout(self.dropout)(layer)
+            if i == 1:
+                layer = layers.Dropout(self.dropout)(layer)
         output = layers.Dense(1, activation= 'linear')(layer)
         self.model = tf.keras.Model(inputs=inputlayer, outputs=output)
         SGDsolver = tf.keras.optimizers.SGD(
@@ -37,10 +37,10 @@ class individual():
             decay=self.decay, 
             nesterov=True
         )
-        self.model.compile(loss='mean_squared_error', optimizer='Adam')
+        self.model.compile(loss='mean_squared_error', optimizer=SGDsolver)
 
-    def fit(self,X,y,epochs=100):
-        self.model.fit(X,y, batch_size=self.batch_size, epochs=epochs)#, validation_split=0.1)
+    def fit(self,X,y,epochs=20):
+        self.model.fit(X,y, batch_size=self.batch_size, epochs=epochs, verbose=False)#, validation_split=0.1)
     
     @property
     def traits(self):
@@ -54,13 +54,13 @@ class individual():
         traits = {
             'layer_sizes':layer_func(
                 np.random.randint(3,10),
-                np.random.randint(10,200),
+                np.random.randint(2,100),
                 np.random.random()*2 + 0.1,
             ),
             'learning_rate': np.round( np.random.random()*0.5+0.01, 4),
             'momentum': np.round(np.random.random()*0.5+0.01, 4),
-            'dropout': np.round(np.random.random()*0.5, 4),
-            'decay': np.round(np.random.random()*0.0001,4),
+            'dropout': np.round(np.random.random()*0.25, 4),
+            'decay': np.round(np.random.random()*0.0001,6),
             'batch_size': np.random.randint(1,32),
         }
         return traits
@@ -109,51 +109,41 @@ def create_data(func, NUM=10000):
     return X.reshape(-1,1), y.reshape(-1,1)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    help_ = "Number of training epochs"
+    parser.add_argument("-e", "--epochs", help=help_, default=10, type=int)
+    help_ = "Initial population size"
+    parser.add_argument("-p", "--population", help=help_, default=50, type=int)
+    help_ = "Number of generations"
+    parser.add_argument("-g", "--generations", help=help_, default=5, type=int)
+    args = parser.parse_args()
 
-    # input args:
-        # epochs
-        # init size
-        # num generations
-    
     # create some data 
     X_train, y_train = create_data( np.cos, 1000)
     X_test, y_test = create_data( np.cos, 1000)
     
-    parent1 = individual.randomize()
-    parent2 = individual.randomize()
-    baby1, baby2 = individual.breed(parent1, parent2)
-    print(parent1.traits)
-    print(parent2.traits)
-    print(baby1.traits)
-    print(baby2.traits)
-    
-    parent1.fit( X_train, y_train )
-
-    f,ax = plt.subplots(2)
-    y_pred = parent1.model.predict( X_train ) 
-    mse = np.sum( (y_pred - y_train)**2) 
-    print(mse)
-    plt.plot(X_train,y_pred,'k.'); plt.plot(X_train,y_train,'g.'); plt.show() 
-
-    y_pred = parent1.model.predict( X_test ) 
-    mse = np.sum( (y_pred - y_test)**2) 
-    print(mse)
-    plt.plot(X_test,y_pred,'r.'); plt.plot(X_test,y_test,'g.'); plt.show() 
-
-
-
-    dude()
     # create lots of neural networks
     population = []
     mse = []
     print("Generating initial population")
-    for i in range(100):
+    for i in range(args.population): 
         population.append( individual.randomize() )
     
-    for j in range(5): # generation 
-
+    # loop through generations and breed
+    for j in range(args.generations): 
         for i in range(len(population)):
-            population[i].fit(X_train, y_train)
+            population[i].fit(X_train, y_train, epochs=args.epochs)
 
-    
+            # evaluate fitness
+            y_pred = population[i].model.predict( X_test ) 
+            mse.append( np.sum( (y_pred - y_test)**2) )
 
+        idx = np.argsort(mse)
+        # remove lower 50% of models 
+
+        # breed 50% of best models randomly 
+        for i in range(int(len(population)*0.5)):
+            pass
+
+        # reset weights
+        population[i].model.reset_states()
