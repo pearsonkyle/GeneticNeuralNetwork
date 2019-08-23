@@ -1,5 +1,5 @@
 import argparse
-
+import pandas 
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -42,6 +42,12 @@ class individual():
     def fit(self,X,y,epochs=20):
         self.model.fit(X,y, batch_size=self.batch_size, epochs=epochs, verbose=False)#, validation_split=0.1)
     
+    def __repr__(self):
+        string = " <" + str(type(self).__name__) + "> " 
+        for k in self.traits.keys():
+            string += "{}:{}, ".format(k, getattr(self,k) )
+        return string[:-2]
+
     @property
     def traits(self):
         traits = ['layer_sizes', 'batch_size', 'learning_rate', 'momentum', 'decay', 'dropout']
@@ -131,19 +137,43 @@ if __name__ == "__main__":
     
     # loop through generations and breed
     for j in range(args.generations): 
+        print("Generation: {}, Population: {}".format(j, len(population)))
+        mse = []
         for i in range(len(population)):
+            population[i].model.reset_states()
             population[i].fit(X_train, y_train, epochs=args.epochs)
 
             # evaluate fitness
             y_pred = population[i].model.predict( X_test ) 
             mse.append( np.sum( (y_pred - y_test)**2) )
 
-        idx = np.argsort(mse)
-        # remove lower 50% of models 
+        if j != args.generations-1:
 
-        # breed 50% of best models randomly 
-        for i in range(int(len(population)*0.5)):
-            pass
+            # save top 50% of models 
+            idx = np.argsort(mse)
+            mse = [mse[i] for i in idx[:int(0.5*len(population))] ]
+            population = [population[i] for i in idx[:int(0.5*len(population))] ]
 
-        # reset weights
-        population[i].model.reset_states()
+            # randomly breed and add to population
+            allidx = np.arange(len(population) - len(population)%2) # only even number
+            np.random.shuffle(allidx)
+            allidx = allidx.reshape(-1,2) # pair up 
+            for i in allidx:
+                population.extend( individual.breed( population[i[0]], population[i[1]] ) )
+
+    # TODO build distributions 
+    alltraits = [population[i].traits for i in range(len(population))]
+    df = pandas.DataFrame(alltraits)
+    df['mse'] = mse
+
+    traits = ['batch_size', 'learning_rate', 'momentum', 'decay', 'dropout']
+    f, ax = plt.subplots(1,len(traits),figsize=(10,5))
+    for i in range(len(traits)):
+        ax[i].plot(df[traits[i]], df['mse'], 'ko' )
+        ax[i].set_xlabel(traits[i])
+        ax[i].set_ylabel('MSE')
+    plt.tight_layout()
+    plt.show()
+    
+    # save best model 
+    # create plot of best and worst
